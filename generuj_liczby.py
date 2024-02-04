@@ -4,8 +4,9 @@ from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Bidirectional, Dropout
 batch_size = 100
+ile_generowac = 3 #powinno być 300
 
-df = pd.read_csv(r"C:\Users\darda\OneDrive\Pulpit\Lotto\file.csv")
+df = pd.read_csv(r"C:\xampp\htdocs\test\file.csv")
 
 df.drop(['Game', 'Date'], axis=1, inplace=True)
 
@@ -55,7 +56,7 @@ from tensorflow import keras
 from tensorflow.keras.optimizers import Adam
 
 model.compile(optimizer=Adam(learning_rate=0.0001), loss ='mse', metrics=['accuracy'])
-model.fit(x=X, y=y, batch_size=100, epochs=300, verbose=2)
+model.fit(x=X, y=y, batch_size=100, epochs=ile_generowac, verbose=2)
 
 to_predict = df.tail(8)
 to_predict.drop([to_predict.index[-1]],axis=0, inplace=True)
@@ -63,8 +64,8 @@ to_predict = np.array(to_predict)
 scaled_to_predict = scaler.transform(to_predict)
 
 y_pred = model.predict(np.array([scaled_to_predict]))
-print("The predicted numbers in the last lottery game are:", scaler.inverse_transform(y_pred).astype(int)[0])
+print("Przewidywane liczby to:", scaler.inverse_transform(y_pred).astype(int)[0])
 
 prediction = df.tail(1)
 prediction = np.array(prediction)
-print("The actual numbers in the last lottery game were:", prediction[0])
+print("Aktualne liczby z pliku to:", prediction[0])
