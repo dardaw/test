@@ -6,7 +6,7 @@ from keras.layers import LSTM, Dense, Bidirectional, Dropout
 batch_size = 100
 ile_generowac = 300 #powinno być 300
 
-df = pd.read_csv(r" /home/dardaw/test/file.csv")
+df = pd.read_csv(r"/home/dardaw/test/file.csv")
 
 df.drop(['Game', 'Date'], axis=1, inplace=True)
 
