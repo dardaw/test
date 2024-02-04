@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Bidirectional, Dropout
 batch_size = 100
-ile_generowac = 300 #powinno być 300
+ile_generowac = 200 #powinno być 300
 
 df = pd.read_csv(r"C:\xampp\htdocs\test\file.csv")
 
