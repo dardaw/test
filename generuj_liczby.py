@@ -59,10 +59,11 @@ from tensorflow.keras.optimizers import Adam
 model.compile(optimizer=Adam(learning_rate=0.0001), loss ='mse', metrics=['accuracy'])
 model.fit(x=X, y=y, batch_size=100, epochs=ile_generowac, verbose=2)
 
-to_predict = df.tail(8)
+to_predict = df.tail(8) #tu bylo 8
 
-#to_predict.drop([to_predict.index[-1]],axis=0, inplace=True)
+#to_predict.drop([to_predict.index[-1]],axis=0, inplace=True) #tu bylo -1
 to_predict = np.array(to_predict)
+print(to_predict)
 scaled_to_predict = scaler.transform(to_predict)
 
 y_pred = model.predict(np.array([scaled_to_predict]))
