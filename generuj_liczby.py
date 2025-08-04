@@ -7,13 +7,13 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 # 1. Pobieranie danych historycznych
 # Zakładamy, że dane są w pliku CSV z kolumnami: data, num1, num2, num3, num4, num5, num6
-data = pd.read_csv('superenalotto_history.csv')
+data = pd.read_csv('file.csv')
 
 # 2. Przetwarzanie danych
 # Wybieramy tylko kolumny z numerami
 numbers = data[['num1', 'num2', 'num3', 'num4', 'num5', 'num6']].values
 
-# Normalizacja danych do zakresu [0, 1]
+# Normalizacja danych do zakresu [0, 1] (dla puli 1-49)
 scaler = MinMaxScaler(feature_range=(0, 1))
 numbers_scaled = scaler.fit_transform(numbers)
 
@@ -28,7 +28,7 @@ def create_sequences(data, seq_length):
 seq_length = 10
 X, y = create_sequences(numbers_scaled, seq_length)
 
-# Podział na zbiory treningowy i testowy
+# Podział na zbiory treningowy i testowy (80% trening, 20% test)
 split = int(0.8 * len(X))
 X_train, X_test = X[:split], X[split:]
 y_train, y_test = y[:split], y[split:]
@@ -41,7 +41,7 @@ model.add(LSTM(240, return_sequences=True))
 model.add(Dropout(0.2))
 model.add(LSTM(240))
 model.add(Dropout(0.2))
-model.add(Dense(6, activation='sigmoid'))
+model.add(Dense(6, activation='sigmoid'))  # Wyjście: 6 liczb w zakresie [0,1]
 
 model.compile(optimizer='adam', loss='mse')
 
@@ -55,17 +55,28 @@ last_sequence = numbers_scaled[-seq_length:]
 last_sequence = np.expand_dims(last_sequence, axis=0)
 
 prediction_scaled = model.predict(last_sequence)
-prediction = scaler.inverse_transform(prediction_scaled)
+prediction = scaler.inverse_transform(prediction_scaled)  # Przekształcenie z powrotem do skali 1-49
 
-# Zaokrąglenie do najbliższych liczb całkowitych
+# Zaokrąglenie do najbliższych liczb całkowitych i zapewnienie unikalności
 prediction = np.round(prediction).astype(int)
+prediction = np.clip(prediction, 1, 49)  # Ograniczenie do zakresu 1-49
 
-# Korekta: upewnij się, że liczby są unikalne i w zakresie 1-90
-prediction = np.clip(prediction, 1, 90)
-prediction = np.unique(prediction)
-while len(prediction) < 6:
-    new_number = np.random.randint(1, 91)
-    if new_number not in prediction:
-        prediction = np.append(prediction, new_number)
+# Usuwanie duplikatów i zapewnienie dokładnie 6 liczb
+unique_numbers = []
+seen = set()
+for num in prediction.flatten():
+    if num not in seen and len(unique_numbers) < 6:
+        unique_numbers.append(num)
+        seen.add(num)
 
-print("Przewidywane liczby dla następnego losowania:", prediction) 
+# Jeśli jest mniej niż 6 liczb, wybieramy najbliższe unikalne wartości
+while len(unique_numbers) < 6:
+    for i in range(1, 50):
+        if i not in seen and len(unique_numbers) < 6:
+            unique_numbers.append(i)
+            seen.add(i)
+
+# Sortowanie liczb dla czytelności
+unique_numbers = sorted(unique_numbers)
+
+print("Przewidywane liczby dla następnego losowania:", unique_numbers) 
