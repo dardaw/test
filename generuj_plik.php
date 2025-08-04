@@ -1,11 +1,13 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);  
 
 $plik = file('http://www.mbnet.com.pl/dl.txt');
 //6959. 09.11.2023 4,7,24,35,36,47
 $lista = [];
 $ostatni = false;
 $string = '';
-$lista[0] = ['Game', 'Date', 'A', 'B', 'C', 'D', 'E', 'F'];
+$lista[0] = ['Data', 'Date', 'num1', 'num2', 'num3', 'num4', 'num5', 'num6'];
 foreach ($plik as $klucz => $linia) {
     list($nr, $data, $liczby) = explode(' ', $linia);
     $liczba = explode(',', $liczby);
