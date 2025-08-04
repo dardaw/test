@@ -11,7 +11,7 @@ data = pd.read_csv('file.csv')
 
 # 2. Przetwarzanie danych
 # Wybieramy tylko kolumny z numerami
-numbers = data[['num1', 'num2', 'num3', 'num4', 'num5', 'num6']].values
+numbers = data[['num1', 'num2', 'num3', 'num4', 'num5']].values
 
 # Normalizacja danych do zakresu [0, 1] (dla puli 1-49)
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -35,13 +35,13 @@ y_train, y_test = y[:split], y[split:]
 
 # 3. Budowanie i trenowanie modelu LSTM
 model = Sequential()
-model.add(LSTM(240, return_sequences=True, input_shape=(seq_length, 6)))
+model.add(LSTM(240, return_sequences=True, input_shape=(seq_length, 5)))
 model.add(Dropout(0.2))
 model.add(LSTM(240, return_sequences=True))
 model.add(Dropout(0.2))
 model.add(LSTM(240))
 model.add(Dropout(0.2))
-model.add(Dense(6, activation='sigmoid'))  # Wyjście: 6 liczb w zakresie [0,1]
+model.add(Dense(5, activation='sigmoid'))  # Wyjście: 6 liczb w zakresie [0,1]
 
 model.compile(optimizer='adam', loss='mse')
 
@@ -59,20 +59,20 @@ prediction = scaler.inverse_transform(prediction_scaled)  # Przekształcenie z p
 
 # Zaokrąglenie do najbliższych liczb całkowitych i zapewnienie unikalności
 prediction = np.round(prediction).astype(int)
-prediction = np.clip(prediction, 1, 49)  # Ograniczenie do zakresu 1-49
+prediction = np.clip(prediction, 1, 42)  # Ograniczenie do zakresu 1-49
 
 # Usuwanie duplikatów i zapewnienie dokładnie 6 liczb
 unique_numbers = []
 seen = set()
 for num in prediction.flatten():
-    if num not in seen and len(unique_numbers) < 6:
+    if num not in seen and len(unique_numbers) < 5:
         unique_numbers.append(num)
         seen.add(num)
 
 # Jeśli jest mniej niż 6 liczb, wybieramy najbliższe unikalne wartości
-while len(unique_numbers) < 6:
-    for i in range(1, 50):
-        if i not in seen and len(unique_numbers) < 6:
+while len(unique_numbers) < 5:
+    for i in range(1, 43):
+        if i not in seen and len(unique_numbers) < 5:
             unique_numbers.append(i)
             seen.add(i)
 
